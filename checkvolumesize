@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 show_help () {
   cat << EOF
-checkvolumesize 1.0.0
+checkvolumesize 1.2
 
 Automatically expand Digital Ocean block storage volumes.
 
@@ -36,7 +36,7 @@ POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   key="$1"
 
-  BUFFER=10
+  #BUFFER=10
   LOG=false
 
   case $key in
@@ -169,13 +169,29 @@ main () {
   check_options
 
   # Check available volume space
-  log "Checking available space on device \"${DEVICE}\" is above ${BUFFER}GB requirement..."
+  log "Checking if available space on device \"${DEVICE}\" is above our ${BUFFER}GB requirement..."
   volume_free_space=$(check_device_free_space $DEVICE)
+  
+  #Check if empty,not a number
+  if [ -n "$volume_free_space" ] && [ "$volume_free_space" -eq "$volume_free_space" ] 2>/dev/null; then
+    log " Local volume_free_space is:${volume_free_space}GB"
+  else
+    log "Coudn't get local volume_free_space value exiting!"
+    exit 1
+  fi
+
+
   if [[ $volume_free_space -gt $BUFFER ]]; then
+    
     log "${volume_free_space}GB available, all good!"
     return
+    exit 1
   fi
-  log "Only ${volume_free_space}GB available, volume resize required"
+
+  
+
+
+  log "Only ${volume_free_space}GB available, volume ++ resize ++ required..."
 
   # Save start time
   start_time=$SECONDS
@@ -190,6 +206,7 @@ main () {
   # Increase volume size
   new_volume_size=$(expr $volume_size + $BUFFER)
   log "Increasing volume size to ${new_volume_size}GB..."
+ 
   action_json=$(digital_ocean_api "volumes/${volume_id}/actions" '{"type":"resize","size_gigabytes":'$new_volume_size'}')
   action_id=$(echo $action_json | jq -r '.action.id')
   log "Created action \"${action_id}\""
