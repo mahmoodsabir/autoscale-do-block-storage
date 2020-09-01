@@ -1,4 +1,6 @@
 # checkvolumesize
+checkvolumesize 1.2 (Some fixes and data validation)
+
 
 > Autoscale Digital Ocean block storage volumes
 
@@ -14,7 +16,7 @@ Inspired by this feature request:
 
 ```
 $ checkvolumesize --help
-checkvolumesize 1.0.0
+checkvolumesize 1.2
 
 Automatically expand Digital Ocean block storage volumes.
 
@@ -106,5 +108,8 @@ You can view the log in `/var/logs/checkvolumesize.log`
 ```
 
 ## License
-
+Original work by :lukechilds
 MIT © Luke Childs
+
+## Fixes and data validation
+Mahmood Sabir
