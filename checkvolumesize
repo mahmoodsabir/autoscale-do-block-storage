@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 show_help () {
   cat << EOF
-checkvolumesize 1.2
+checkvolumesize 1.0.0
 
 Automatically expand Digital Ocean block storage volumes.
 
@@ -169,29 +169,14 @@ main () {
   check_options
 
   # Check available volume space
-  log "Checking if available space on device \"${DEVICE}\" is above our ${BUFFER}GB requirement..."
+  log "Checking available space on device \"${DEVICE}\" is above ${BUFFER}GB requirement..."
   volume_free_space=$(check_device_free_space $DEVICE)
-  
-  #Check if empty,not a number
-  if [ -n "$volume_free_space" ] && [ "$volume_free_space" -eq "$volume_free_space" ] 2>/dev/null; then
-    log " Local volume_free_space is:${volume_free_space}GB"
-  else
-    log "Coudn't get local volume_free_space value exiting!"
-    exit 1
-  fi
-
-
   if [[ $volume_free_space -gt $BUFFER ]]; then
-    
     log "${volume_free_space}GB available, all good!"
-    return
     exit 1
+    return
   fi
-
-  
-
-
-  log "Only ${volume_free_space}GB available, volume ++ resize ++ required..."
+  log "Only ${volume_free_space}GB available, volume resize required"
 
   # Save start time
   start_time=$SECONDS
@@ -218,7 +203,7 @@ main () {
     if [[ "${resize_status}" == "completed" ]]; then
       break
     fi
-    sleep 1
+    sleep 60
   done
   log "Volume resize complete!"
 
@@ -238,6 +223,11 @@ main () {
   # Show duration
   duration=$(expr $SECONDS - $start_time)
   log "Completed in ${duration} seconds"
+
+sleep 10
+exit 1
 }
 
 main
+
+
