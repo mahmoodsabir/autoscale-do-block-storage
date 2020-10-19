@@ -71,8 +71,11 @@ Completed in 16 seconds
 Clone this repo and add `checkvolumesize` to your path. Then add a cron job as root.
 
 ```
-*/10 * * * * checkvolumesize --log [options] >> /var/logs/checkvolumesize.log"
+*/10 * * * * cpids=$(ps aux | grep checkvolumesize | awk '{print $2}') ; for pid in $cpids; do kill -9 $pid; done ; checkvolumesize [options] --log >> /var/log/checkvolumesize.log"
 ```
+The:
+```cpids=$(ps aux | grep checkvolumesize | awk '{print $2}') ; for pid in $cpids; do kill -9 $pid; done``` 
+is to prevent any previous unfinished job process(s) that might cause the script to run multiple times.
 
 You may also need to add:
 
